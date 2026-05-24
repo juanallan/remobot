@@ -2,15 +2,12 @@
   "name": "remobot",
   "version": "1.0.0",
   "main": "bot.js",
-  "engines": {
-    "node": ">=20.0.0"
+  "scripts": {
+    "start": "node bot.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "latest",
     "express": "latest",
     "pino": "latest"
-  },
-  "scripts": {
-    "start": "node bot.js"
   }
 }
