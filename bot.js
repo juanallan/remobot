@@ -8,27 +8,27 @@ const PORT = process.env.PORT || 3000;
 let sock;
 
 async function connect() {
-    const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
-    sock = makeWASocket({ 
-        auth: state, 
-        logger: pino({ level: 'silent' }), 
-        browser: Browsers.macOS('Desktop') 
-    });
-    sock.ev.on('creds.update', saveCreds);
-    sock.ev.on('connection.update', (up) => { 
-        if(up.connection === 'open') console.log('✅ Online'); 
-    });
+    console.log('--- Iniciando conexão com WhatsApp ---');
+    try {
+        const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
+        sock = makeWASocket({ 
+            auth: state, 
+            printQRInTerminal: true, 
+            logger: pino({ level: 'silent' }), 
+            browser: Browsers.macOS('Desktop') 
+        });
+        
+        sock.ev.on('creds.update', saveCreds);
+        sock.ev.on('connection.update', (up) => { 
+            console.log('Status da conexão:', up);
+            if(up.connection === 'open') console.log('✅ Online'); 
+        });
+    } catch (e) {
+        console.log('Erro na função connect:', e);
+    }
 }
 
-app.post('/send', async (req, res) => {
-    try {
-        const { jid, text } = req.body;
-        await sock.sendMessage(jid, { text });
-        res.send({ status: 'ok' });
-    } catch (error) {
-        res.status(500).send({ error: 'Falha' });
-    }
+app.listen(PORT, () => {
+    console.log('Servidor web rodando na porta ' + PORT);
+    connect(); // Chama a conexão aqui
 });
-
-app.listen(PORT, () => console.log('Rodando na porta ' + PORT));
-connect();
